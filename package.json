@@ -7,7 +7,7 @@
   },
   "bugs": "https://github.com/jonsmithers/wordsafe/issues",
   "engines": {
-    "node": ">=8.0.0"
+    "node": ">=18.0.0"
   },
   "files": [
     "/bin",
@@ -33,9 +33,9 @@
   "scripts": {
     "postpack": "rm -f oclif.manifest.json",
     "posttest": "eslint . --ext .ts --config .eslintrc",
-    "prepack": "rm -rf lib && tsc -b && oclif-dev manifest && oclif-dev readme",
+    "prepack": "rm -rf lib && tsc -b && oclif manifest && oclif readme",
     "test": "nyc --extension .ts mocha --forbid-only \"test/**/*.test.ts\"",
-    "version": "oclif-dev readme && git add README.md"
+    "version": "oclif readme && git add README.md"
   },
   "types": "lib/index.d.ts",
   "dependencies": {
@@ -53,7 +53,7 @@
     "tslib": "*"
   },
   "devDependencies": {
-    "@oclif/dev-cli": "*",
+    "oclif": "*",
     "@oclif/test": "*",
     "@types/chai": "*",
     "@types/mocha": "*",

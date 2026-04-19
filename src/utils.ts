@@ -1,9 +1,8 @@
 import * as child_process from 'child_process'
 import * as fs from 'fs'
 import * as tmp from 'tmp'
-import Command from '@oclif/command'
+import {Command, Flags} from '@oclif/core'
 import {Readable} from 'stream'
-import {flags} from '@oclif/command'
 import {polyfill} from 'secure-remove'
 
 export function openFile(editor: string, filepath: string) {
@@ -58,14 +57,14 @@ export abstract class WordsafeCommand extends Command {
 export const SHARED_FLAGS = {
   editor(default_: string) {
     return {
-      editor: flags.string({char: 'e', description: 'open unencrypted file with editor', default: default_}),
+      editor: Flags.string({char: 'e', description: 'open unencrypted file with editor', default: default_}),
     }
   },
   legacyDecrypt: {
-    'legacy-decrypt': flags.boolean({}),
+    'legacy-decrypt': Flags.boolean({}),
   },
   legacyLegacyDecrypt: {
-    'legacy-legacy-decrypt': flags.boolean({}),
+    'legacy-legacy-decrypt': Flags.boolean({}),
   },
 }
 

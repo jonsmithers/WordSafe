@@ -1,4 +1,4 @@
-import {flags} from '@oclif/command'
+import {Args} from '@oclif/core'
 import cli from 'cli-ux'
 import * as fs from 'fs'
 import encryption from '../encryption'
@@ -13,26 +13,26 @@ export default class Read extends WordsafeCommand {
   ]
 
   static flags = {
-    help: flags.help({char: 'h'}),
     ...SHARED_FLAGS.editor('less'),
     ...SHARED_FLAGS.legacyDecrypt,
     ...SHARED_FLAGS.legacyLegacyDecrypt,
   }
 
-  static args = [{
-    name: 'file',
-    required: true,
-    description: 'encrypted file',
-  }]
+  static args = {
+    file: Args.string({
+      required: true,
+      description: 'encrypted file',
+    }),
+  }
 
   async run() {
-    const {args, flags} = this.parse(Read)
+    const {args, flags} = await this.parse(Read)
 
-    const editor = flags.editor
+    const editor = flags.editor!
     const password = await cli.prompt('Password', {type: 'hide', required: false})
     await withTempFile(async tmpFile => {
       await encryption.filenames.decrypt(
-        args.file,
+        args.file!,
         tmpFile,
         password,
         {

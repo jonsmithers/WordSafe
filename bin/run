@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
-require('@oclif/command').run()
-.then(require('@oclif/command/flush'))
-.catch(require('@oclif/errors/handle'))
+const {execute} = require('@oclif/core')
+const path = require('path')
+
+execute({dir: path.join(__dirname, '..'), development: false})
