@@ -1,12 +1,12 @@
-import * as crypto from 'crypto'
-import * as fs from 'fs'
+import * as crypto from 'node:crypto'
+import * as fs from 'node:fs'
+import * as stream from 'node:stream'
+import zlib from 'node:zlib'
 import streamToPromise from 'stream-to-promise'
-import * as stream from 'stream'
-import zlib from 'zlib'
 
 interface Header {
-  version: number;
   sizeOfIv: number;
+  version: number;
 }
 
 const encryption = {
@@ -16,13 +16,14 @@ const encryption = {
       decryptedFilename: string,
       password: string,
       opts: {
-        legacyLegacyDecryption?: boolean;
         legacyDecryption?: boolean;
-      } = {}
+        legacyLegacyDecryption?: boolean;
+      } = {},
     ) {
       if (opts.legacyLegacyDecryption || opts.legacyDecryption) {
         return encryption.streams.decryptLegacy(fs.createReadStream(encryptedFilename), fs.createWriteStream(decryptedFilename), password, opts)
       }
+
       return encryption.streams.decrypt(fs.createReadStream(encryptedFilename), fs.createWriteStream(decryptedFilename), password)
     },
     encrypt(decryptedFilename: string, encryptedFilename: string, password: string) {
@@ -30,28 +31,6 @@ const encryption = {
     },
   },
   streams: {
-
-    encrypt(inputStream: fs.ReadStream | stream.Readable, outputStream: fs.WriteStream, password: string) {
-      const {iv, size: sizeOfIv} = randomInitializationVector()
-
-      const header: Header = {
-        version: 1,
-        sizeOfIv,
-      }
-      const headerData = zlib.gzipSync(JSON.stringify(header))
-
-      outputStream.write(Uint8Array.of(headerData.length), 'binary')
-      outputStream.write(headerData)
-      outputStream.write(iv)
-
-      const cipher = crypto.createCipheriv('aes192', passwordToKey(password), iv)
-
-      return stream.promises.pipeline(
-        inputStream,
-        cipher,
-        outputStream
-      )
-    },
 
     async decrypt(inputStream: fs.ReadStream, outputStream: fs.WriteStream, password: string) {
       const sizeOfHeader = await new Promise<number>(resolve => {
@@ -74,25 +53,25 @@ const encryption = {
           const iv = inputStream.read(header.sizeOfIv) as Buffer
           resolve(iv)
         })
-      });
+      })
 
       const cipher = crypto.createDecipheriv(
         'aes-192-cbc',
         passwordToKey(password),
-        iv
-      );
+        iv,
+      )
       return stream.promises.pipeline(
         inputStream,
         cipher,
         outputStream,
-      );
+      )
     },
 
     decryptLegacy(inputStream: fs.ReadStream, outputStream: fs.WriteStream, password: string, opts: { legacyLegacyDecryption?: boolean } = {}) {
       /* eslint-disable no-throw-literal */
-      const cipher = opts.legacyLegacyDecryption ?
-        crypto.createDecipheriv('aes-192-cbc', ...evpBytesToKey(password, 24, 8)) :
-        crypto.createDecipheriv('aes-192-cbc', passwordToKey(password), LEGACY_INITIALIZATION_VECTOR)
+      const cipher = opts.legacyLegacyDecryption
+        ? crypto.createDecipheriv('aes-192-cbc', ...evpBytesToKey(password, 24, 8))
+        : crypto.createDecipheriv('aes-192-cbc', passwordToKey(password), LEGACY_INITIALIZATION_VECTOR)
       inputStream.pipe(cipher).pipe(outputStream)
 
       return Promise.all([
@@ -103,13 +82,35 @@ const encryption = {
           throw 'Failed to decrypt. Bad password? ' + error.message
         }),
       ])
-      /* eslint-enable node/no-deprecated-api no-throw-literal */
+      /* eslint-enable no-throw-literal */
+    },
+
+    encrypt(inputStream: fs.ReadStream | stream.Readable, outputStream: fs.WriteStream, password: string) {
+      const {iv, size: sizeOfIv} = randomInitializationVector()
+
+      const header: Header = {
+        sizeOfIv,
+        version: 1,
+      }
+      const headerData = zlib.gzipSync(JSON.stringify(header))
+
+      outputStream.write(Uint8Array.of(headerData.length), 'binary')
+      outputStream.write(headerData)
+      outputStream.write(iv)
+
+      const cipher = crypto.createCipheriv('aes192', passwordToKey(password), iv)
+
+      return stream.promises.pipeline(
+        inputStream,
+        cipher,
+        outputStream,
+      )
     },
   },
 }
 
-const LEGACY_INITIALIZATION_VECTOR = new Uint8Array(16);
-[
+const LEGACY_INITIALIZATION_VECTOR = new Uint8Array(16)
+for (const [i, v] of [
   98,
   220,
   35,
@@ -126,9 +127,9 @@ const LEGACY_INITIALIZATION_VECTOR = new Uint8Array(16);
   179,
   156,
   3,
-].forEach((v, i) => {
+].entries()) {
   LEGACY_INITIALIZATION_VECTOR[i] = v
-})
+}
 
 function randomInitializationVector() {
   const iv = new Uint8Array(16)
@@ -152,11 +153,12 @@ function evpBytesToKey(password: string, keyLen: number, ivLen: number): [Buffer
       iv = Buffer.concat([iv, prev.subarray(Math.min(keyNeeded, prev.length), Math.min(keyNeeded + ivNeeded, prev.length))])
     }
   }
+
   return [key.subarray(0, keyLen), iv.subarray(0, ivLen)]
 }
 
 function passwordToKey(password: string): Buffer {
-  return crypto.pbkdf2Sync(password, 'salt', 100000, 192 / 8, 'sha512')
+  return crypto.pbkdf2Sync(password, 'salt', 100_000, 192 / 8, 'sha512')
 }
 
 export default encryption

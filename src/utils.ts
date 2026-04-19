@@ -1,14 +1,14 @@
-import * as child_process from 'child_process'
-import * as fs from 'fs'
-import * as tmp from 'tmp'
 import {Command, Flags} from '@oclif/core'
-import {Readable} from 'stream'
+import * as childProcess from 'node:child_process'
+import * as fs from 'node:fs'
+import {Readable} from 'node:stream'
 import {polyfill} from 'secure-remove'
+import * as tmp from 'tmp'
 
 export function openFile(editor: string, filepath: string) {
   return new Promise((resolve, reject) => {
     const [editorCmd, ...editorArgs] = editor.split(' ')
-    const p = child_process.spawn(editorCmd, [...editorArgs, filepath], {
+    const p = childProcess.spawn(editorCmd, [...editorArgs, filepath], {
       stdio: 'inherit',
     })
     p.on('close', resolve)
@@ -36,6 +36,7 @@ export function stringToStream(str: string): Readable {
   if (str2.slice(-1) !== '\n') {
     str2 += '\n' // Adhere to POSIX
   }
+
   const stream = new Readable()
   stream._read = () => {/* nothing */}
   stream.push(str2)
@@ -44,20 +45,20 @@ export function stringToStream(str: string): Readable {
 }
 
 function logInfoToStderr(s: string) {
-  /* eslint-disable-next-line no-console, semi */
+  /* eslint-disable-next-line semi */
   console.error(s);
 }
 
 export abstract class WordsafeCommand extends Command {
-  async catch(error: any) {
-    this.error(error)
+  async catch(error: unknown) {
+    this.error(error as Error)
   }
 }
 
 export const SHARED_FLAGS = {
   editor(default_: string) {
     return {
-      editor: Flags.string({char: 'e', description: 'open unencrypted file with editor', default: default_}),
+      editor: Flags.string({char: 'e', default: default_, description: 'open unencrypted file with editor'}),
     }
   },
   legacyDecrypt: {

@@ -1,11 +1,19 @@
-import {Flags, Args} from '@oclif/core'
-import cli from 'cli-ux'
-import encryption from '../encryption'
-import {openFile, withTempFile, WordsafeCommand, SHARED_FLAGS, makeDateStr, stringToStream} from '../utils'
-import * as fs from 'fs'
+import {Args, Flags} from '@oclif/core'
+import {cli} from 'cli-ux'
 import CombinedStream from 'combined-stream'
+import * as fs from 'node:fs'
+
+import encryption from '../encryption'
+import {SHARED_FLAGS, WordsafeCommand, makeDateStr, openFile, stringToStream, withTempFile} from '../utils'
 
 export default class Push extends WordsafeCommand {
+  static args = {
+    file: Args.string({
+      description: 'encrypted file',
+      required: true,
+    }),
+  }
+
   static description = 'Open an empty editor for you to type in and append the contents you type to <file>'
 
   static examples = [
@@ -14,22 +22,15 @@ export default class Push extends WordsafeCommand {
 
   static flags = {
     ...SHARED_FLAGS.editor('vim'),
-    'prepend-date-visibly': Flags.boolean({char: 'D', description: 'prepend current date before opening file'}),
     'prepend-date': Flags.boolean({char: 'd', description: 'prepend current date after closing file'}),
-  }
-
-  static args = {
-    file: Args.string({
-      required: true,
-      description: 'encrypted file',
-    }),
+    'prepend-date-visibly': Flags.boolean({char: 'D', description: 'prepend current date before opening file'}),
   }
 
   async run() {
     const {args, flags} = await this.parse(Push)
 
     const editor = flags.editor!
-    const password = await cli.prompt('Password', {type: 'hide', required: false})
+    const password = await cli.prompt('Password', {required: false, type: 'hide'})
 
     // check that we can decrypt without throwing any error
     await withTempFile(async testFile => {
@@ -52,6 +53,7 @@ export default class Push extends WordsafeCommand {
         if (flags['prepend-date']) {
           combinedStream.append(stringToStream(makeDateStr()))
         }
+
         combinedStream.append(fs.createReadStream(emptyTmpFile))
         await encryption.streams.encrypt(combinedStream as unknown as fs.ReadStream, fs.createWriteStream(args.file!), password)
       })
