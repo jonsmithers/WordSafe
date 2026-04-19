@@ -3,7 +3,9 @@ import {cli} from 'cli-ux'
 import * as fs from 'node:fs'
 
 import encryption from '../encryption'
-import {SHARED_FLAGS, WordsafeCommand, openFile, withTempFile} from '../utils'
+import {
+  openFile, SHARED_FLAGS, withTempFile, WordsafeCommand,
+} from '../utils'
 
 export default class Read extends WordsafeCommand {
   static args = {
@@ -12,14 +14,11 @@ export default class Read extends WordsafeCommand {
       required: true,
     }),
   }
-
   static description = 'Decrypt contents for perusal (doesn\'t save changes)'
-
   static examples = [
     '$ wordsafe read encrypted-file\n',
     '$ wordsafe read encrypted-file --editor=cat\n# ^ this prints decrypted file to stdout',
   ]
-
   static flags = {
     ...SHARED_FLAGS.editor('less'),
     ...SHARED_FLAGS.legacyDecrypt,

@@ -45,7 +45,6 @@ export function stringToStream(str: string): Readable {
 }
 
 function logInfoToStderr(s: string) {
-  /* eslint-disable-next-line semi */
   console.error(s);
 }
 

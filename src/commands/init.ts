@@ -3,7 +3,7 @@ import {cli} from 'cli-ux'
 import * as fs from 'node:fs'
 
 import encryption from '../encryption'
-import {WordsafeCommand, stringToStream} from '../utils'
+import {stringToStream, WordsafeCommand} from '../utils'
 
 export default class Init extends WordsafeCommand {
   static args = {
@@ -12,9 +12,7 @@ export default class Init extends WordsafeCommand {
       required: true,
     }),
   }
-
   static description = 'Set up a new encrypted text file'
-
   static examples = [
     '$ wordsafe init <file>\n',
   ]

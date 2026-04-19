@@ -3,7 +3,9 @@ import {cli} from 'cli-ux'
 import * as fs from 'node:fs'
 
 import encryption from '../encryption'
-import {SHARED_FLAGS, WordsafeCommand, makeDateStr, openFile, withTempFile} from '../utils'
+import {
+  makeDateStr, openFile, SHARED_FLAGS, withTempFile, WordsafeCommand,
+} from '../utils'
 
 export default class Edit extends WordsafeCommand {
   static args = {
@@ -12,14 +14,11 @@ export default class Edit extends WordsafeCommand {
       required: true,
     }),
   }
-
   static description = 'Edit encrypted file with editor of your choice'
-
   static examples = [
     '$ wordsafe edit encrypted-file\n',
     '$ wordsafe edit encrypted-file --editor=nano\n',
   ]
-
   static flags = {
     ...SHARED_FLAGS.editor('vim'),
     ...SHARED_FLAGS.legacyDecrypt,

@@ -67,7 +67,7 @@ const encryption = {
       )
     },
 
-    decryptLegacy(inputStream: fs.ReadStream, outputStream: fs.WriteStream, password: string, opts: { legacyLegacyDecryption?: boolean } = {}) {
+    decryptLegacy(inputStream: fs.ReadStream, outputStream: fs.WriteStream, password: string, opts: {legacyLegacyDecryption?: boolean} = {}) {
       /* eslint-disable no-throw-literal */
       const cipher = opts.legacyLegacyDecryption
         ? crypto.createDecipheriv('aes-192-cbc', ...evpBytesToKey(password, 24, 8))

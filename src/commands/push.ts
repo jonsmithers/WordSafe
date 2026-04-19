@@ -4,7 +4,9 @@ import CombinedStream from 'combined-stream'
 import * as fs from 'node:fs'
 
 import encryption from '../encryption'
-import {SHARED_FLAGS, WordsafeCommand, makeDateStr, openFile, stringToStream, withTempFile} from '../utils'
+import {
+  makeDateStr, openFile, SHARED_FLAGS, stringToStream, withTempFile, WordsafeCommand,
+} from '../utils'
 
 export default class Push extends WordsafeCommand {
   static args = {
@@ -13,13 +15,10 @@ export default class Push extends WordsafeCommand {
       required: true,
     }),
   }
-
   static description = 'Open an empty editor for you to type in and append the contents you type to <file>'
-
   static examples = [
     '$ wordsafe push encrypted-file\n',
   ]
-
   static flags = {
     ...SHARED_FLAGS.editor('vim'),
     'prepend-date': Flags.boolean({char: 'd', description: 'prepend current date after closing file'}),
