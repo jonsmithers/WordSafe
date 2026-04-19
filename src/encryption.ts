@@ -89,9 +89,9 @@ const encryption = {
     },
 
     decryptLegacy(inputStream: fs.ReadStream, outputStream: fs.WriteStream, password: string, opts: { legacyLegacyDecryption?: boolean } = {}) {
-      /* eslint-disable node/no-deprecated-api, no-throw-literal */
+      /* eslint-disable no-throw-literal */
       const cipher = opts.legacyLegacyDecryption ?
-        crypto.createDecipher('aes192', password) :
+        crypto.createDecipheriv('aes-192-cbc', ...evpBytesToKey(password, 24, 8)) :
         crypto.createDecipheriv('aes-192-cbc', passwordToKey(password), LEGACY_INITIALIZATION_VECTOR)
       inputStream.pipe(cipher).pipe(outputStream)
 
@@ -134,6 +134,25 @@ function randomInitializationVector() {
   const iv = new Uint8Array(16)
   crypto.randomFillSync(iv)
   return {iv, size: 16}
+}
+
+// Replicates OpenSSL EVP_BytesToKey (MD5, no salt, 1 iteration) — the key
+// derivation that the removed crypto.createDecipher() used internally.
+function evpBytesToKey(password: string, keyLen: number, ivLen: number): [Buffer, Buffer] {
+  const pass = Buffer.from(password, 'binary')
+  let key = Buffer.alloc(0)
+  let iv = Buffer.alloc(0)
+  let prev = Buffer.alloc(0)
+  while (key.length < keyLen || iv.length < ivLen) {
+    prev = crypto.createHash('md5').update(prev).update(pass).digest()
+    const keyNeeded = keyLen - key.length
+    key = Buffer.concat([key, prev.subarray(0, Math.min(keyNeeded, prev.length))])
+    if (key.length >= keyLen) {
+      const ivNeeded = ivLen - iv.length
+      iv = Buffer.concat([iv, prev.subarray(Math.min(keyNeeded, prev.length), Math.min(keyNeeded + ivNeeded, prev.length))])
+    }
+  }
+  return [key.subarray(0, keyLen), iv.subarray(0, ivLen)]
 }
 
 function passwordToKey(password: string): Buffer {
