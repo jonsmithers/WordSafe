@@ -2,7 +2,7 @@ import {Command, Flags} from '@oclif/core'
 import * as childProcess from 'node:child_process'
 import * as fs from 'node:fs'
 import {Readable} from 'node:stream'
-import {polyfill} from 'secure-remove'
+import secureRemove from 'secure-remove'
 import * as tmp from 'tmp'
 
 export function openFile(editor: string, filepath: string) {
@@ -23,7 +23,7 @@ export async function withTempFile(cb: (tmpfilepath: string) => Promise<void>) {
   } finally {
     if (fs.existsSync(tmpFile.name)) {
       logInfoToStderr(`shredding ${tmpFile.name}`)
-      await polyfill(tmpFile.name) // shred evidence
+      await secureRemove(tmpFile.name) // shred evidence
       logInfoToStderr(`removing ${tmpFile.name}`)
       tmpFile.removeCallback()
     }
