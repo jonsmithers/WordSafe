@@ -37,8 +37,8 @@ wordsafe help read                                                # view documen
 $ npm install -g wordsafe
 $ wordsafe COMMAND
 running command...
-$ wordsafe (-v|--version|version)
-wordsafe/2.1.0 darwin-arm64 node-v17.2.0
+$ wordsafe (--version)
+wordsafe/4.0.0 darwin-arm64 node-v25.8.1
 $ wordsafe --help [COMMAND]
 USAGE
   $ wordsafe COMMAND
@@ -56,26 +56,34 @@ USAGE
 
 ## `wordsafe autocomplete [SHELL]`
 
-display autocomplete installation instructions
+Display autocomplete installation instructions.
 
 ```
 USAGE
-  $ wordsafe autocomplete [SHELL]
+  $ wordsafe autocomplete [SHELL] [-r]
 
 ARGUMENTS
-  SHELL  shell type
+  [SHELL]  (zsh|bash|powershell) Shell type
 
-OPTIONS
+FLAGS
   -r, --refresh-cache  Refresh cache (ignores displaying instructions)
+
+DESCRIPTION
+  Display autocomplete installation instructions.
 
 EXAMPLES
   $ wordsafe autocomplete
+
   $ wordsafe autocomplete bash
+
   $ wordsafe autocomplete zsh
+
+  $ wordsafe autocomplete powershell
+
   $ wordsafe autocomplete --refresh-cache
 ```
 
-_See code: [@oclif/plugin-autocomplete](https://github.com/oclif/plugin-autocomplete/blob/v0.3.0/src/commands/autocomplete/index.ts)_
+_See code: [@oclif/plugin-autocomplete](https://github.com/oclif/plugin-autocomplete/blob/v3.2.45/src/commands/autocomplete/index.ts)_
 
 ## `wordsafe edit FILE`
 
@@ -83,16 +91,19 @@ Edit encrypted file with editor of your choice
 
 ```
 USAGE
-  $ wordsafe edit FILE
+  $ wordsafe edit FILE [-e <value>] [--legacy-decrypt] [--legacy-legacy-decrypt] [--append-date]
 
 ARGUMENTS
   FILE  encrypted file
 
-OPTIONS
-  -e, --editor=editor  [default: vim] open unencrypted file with editor
-  -h, --help           show CLI help
-  --append-date        append current date to end of file
+FLAGS
+  -e, --editor=<value>         [default: vim] open unencrypted file with editor
+      --append-date            append current date to end of file
   --legacy-decrypt
+  --legacy-legacy-decrypt
+
+DESCRIPTION
+  Edit encrypted file with editor of your choice
 
 EXAMPLES
   $ wordsafe edit encrypted-file
@@ -100,24 +111,27 @@ EXAMPLES
   $ wordsafe edit encrypted-file --editor=nano
 ```
 
-_See code: [src/commands/edit.ts](https://github.com/jonsmithers/wordsafe/blob/v2.1.0/src/commands/edit.ts)_
+_See code: [src/commands/edit.ts](https://github.com/jonsmithers/wordsafe/blob/v4.0.0/src/commands/edit.ts)_
 
 ## `wordsafe help [COMMAND]`
 
-display help for wordsafe
+Display help for wordsafe.
 
 ```
 USAGE
-  $ wordsafe help [COMMAND]
+  $ wordsafe help [COMMAND...] [-n]
 
 ARGUMENTS
-  COMMAND  command to show help for
+  [COMMAND...]  Command to show help for.
 
-OPTIONS
-  --all  see all commands in CLI
+FLAGS
+  -n, --nested-commands  Include all nested commands in the output.
+
+DESCRIPTION
+  Display help for wordsafe.
 ```
 
-_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v3.2.2/src/commands/help.ts)_
+_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/6.2.44/src/commands/help.ts)_
 
 ## `wordsafe init FILE`
 
@@ -130,11 +144,14 @@ USAGE
 ARGUMENTS
   FILE  encrypted file
 
-EXAMPLE
+DESCRIPTION
+  Set up a new encrypted text file
+
+EXAMPLES
   $ wordsafe init <file>
 ```
 
-_See code: [src/commands/init.ts](https://github.com/jonsmithers/wordsafe/blob/v2.1.0/src/commands/init.ts)_
+_See code: [src/commands/init.ts](https://github.com/jonsmithers/wordsafe/blob/v4.0.0/src/commands/init.ts)_
 
 ## `wordsafe push FILE`
 
@@ -142,22 +159,24 @@ Open an empty editor for you to type in and append the contents you type to <fil
 
 ```
 USAGE
-  $ wordsafe push FILE
+  $ wordsafe push FILE [-e <value>] [-d] [-D]
 
 ARGUMENTS
   FILE  encrypted file
 
-OPTIONS
+FLAGS
   -D, --prepend-date-visibly  prepend current date before opening file
   -d, --prepend-date          prepend current date after closing file
-  -e, --editor=editor         [default: vim] open unencrypted file with editor
-  -h, --help                  show CLI help
+  -e, --editor=<value>        [default: vim] open unencrypted file with editor
 
-EXAMPLE
+DESCRIPTION
+  Open an empty editor for you to type in and append the contents you type to <file>
+
+EXAMPLES
   $ wordsafe push encrypted-file
 ```
 
-_See code: [src/commands/push.ts](https://github.com/jonsmithers/wordsafe/blob/v2.1.0/src/commands/push.ts)_
+_See code: [src/commands/push.ts](https://github.com/jonsmithers/wordsafe/blob/v4.0.0/src/commands/push.ts)_
 
 ## `wordsafe read FILE`
 
@@ -165,15 +184,18 @@ Decrypt contents for perusal (doesn't save changes)
 
 ```
 USAGE
-  $ wordsafe read FILE
+  $ wordsafe read FILE [-e <value>] [--legacy-decrypt] [--legacy-legacy-decrypt]
 
 ARGUMENTS
   FILE  encrypted file
 
-OPTIONS
-  -e, --editor=editor  [default: less] open unencrypted file with editor
-  -h, --help           show CLI help
+FLAGS
+  -e, --editor=<value>         [default: less] open unencrypted file with editor
   --legacy-decrypt
+  --legacy-legacy-decrypt
+
+DESCRIPTION
+  Decrypt contents for perusal (doesn't save changes)
 
 EXAMPLES
   $ wordsafe read encrypted-file
@@ -182,5 +204,5 @@ EXAMPLES
   # ^ this prints decrypted file to stdout
 ```
 
-_See code: [src/commands/read.ts](https://github.com/jonsmithers/wordsafe/blob/v2.1.0/src/commands/read.ts)_
+_See code: [src/commands/read.ts](https://github.com/jonsmithers/wordsafe/blob/v4.0.0/src/commands/read.ts)_
 <!-- commandsstop -->
